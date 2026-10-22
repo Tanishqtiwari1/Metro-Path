@@ -39,6 +39,11 @@ and re-import (the app needs no code changes). The URL and hash are recorded wit
 
 Large datasets are **not** committed to Git (`backend/data/sources/*.zip` is ignored).
 
+The GitHub Pages edition downloads this same archive at build time (checksum-verified) and serves it
+unmodified alongside the site, so visitors' browsers can load it. This relies on §22 of the portal's
+terms (accurate reproduction with the source acknowledged). The site credits the source on the Dataset
+page and in every route result.
+
 ## What the feed does and does not contain
 
 | Data | Present | How MetroMind uses it |

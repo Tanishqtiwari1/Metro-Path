@@ -1,0 +1,66 @@
+name: Deploy MetroMind to GitHub Pages
+
+# Builds the static, in-browser edition of MetroMind (Python backend runs in the visitor's
+# browser via Pyodide) and publishes it to GitHub Pages.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  # The DMRC GTFS archive bundled into the site. Override with repository variables
+  # GTFS_URL / GTFS_SHA256 (e.g. after downloading a newer official feed). The build fails
+  # if the checksum doesn't match, so the site never ships an unexpected file.
+  GTFS_URL: ${{ vars.GTFS_URL || 'https://raw.githubusercontent.com/nilesh0199/MetroMarg-GraphHacks-2026/main/dmrc_gtfs.zip' }}
+  GTFS_SHA256: ${{ vars.GTFS_SHA256 || 'bd184a7e13907a223032b3b7886babe52ac16b6149f8404f508712b87492fc1b' }}
+  GTFS_LABEL: ${{ vars.GTFS_LABEL || 'DMRC static GTFS (Aug 2023)' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: metromind/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: metromind/frontend/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download GTFS feed
+        run: curl -fsSL "$GTFS_URL" -o "$RUNNER_TEMP/gtfs.zip"
+      - name: Bundle backend + dataset
+        run: python3 scripts/bundle_backend.py --dataset "$RUNNER_TEMP/gtfs.zip" --label "$GTFS_LABEL" --source-url "$GTFS_URL" --sha256 "$GTFS_SHA256"
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - name: Build static site
+        run: npm run build
+        env:
+          VITE_STATIC: 'true'
+          VITE_BASE: /${{ github.event.repository.name }}/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: metromind/frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

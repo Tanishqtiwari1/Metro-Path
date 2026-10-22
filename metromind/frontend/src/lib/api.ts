@@ -1,4 +1,5 @@
 import { getClientId } from './clientId'
+import { inBrowserFetch, STATIC_MODE } from './inbrowser'
 import type {
   Analytics,
   Benchmark,
@@ -41,7 +42,7 @@ async function request<T>(path: string, init: RequestInit & { admin?: string | n
   if (init.admin) headers.set('Authorization', `Bearer ${init.admin}`)
   let res: Response
   try {
-    res = await fetch(`${BASE}${path}`, { ...init, headers })
+    res = STATIC_MODE ? await inBrowserFetch(path, { ...init, headers }) : await fetch(`${BASE}${path}`, { ...init, headers })
   } catch {
     throw new ApiError(0, 'network_error', 'Cannot reach the MetroMind API. Is the backend running?')
   }

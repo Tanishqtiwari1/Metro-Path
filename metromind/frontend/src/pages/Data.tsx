@@ -3,6 +3,7 @@ import { ChevronDown, CloudDownload, Hammer, KeyRound, LockOpen, RotateCcw, Uplo
 import { useState, type FormEvent } from 'react'
 import { Badge, Button, Callout, Card, CardContent, CardDescription, CardHeader, CardTitle, EmptyState, Input, Label, PageHeader, Skeleton, Switch } from '@/components/ui'
 import { api, ApiError } from '@/lib/api'
+import { STATIC_MODE } from '@/lib/inbrowser'
 import { fmtDate, fmtNumber } from '@/lib/format'
 import { useMeta } from '@/lib/queries'
 import type { Dataset, DatasetDetail, Issue } from '@/lib/types'
@@ -218,6 +219,24 @@ export default function DataPage() {
           </CardContent>
         </Card>
 
+        {STATIC_MODE ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Static demo</CardTitle>
+              <CardDescription>This copy of MetroMind runs entirely in your browser.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm text-muted-foreground">
+              <p>
+                The real Python backend (validation, graph building and every algorithm) runs locally via Pyodide. The GTFS
+                feed listed here is bundled with the site and validated each time the page loads.
+              </p>
+              <p>
+                Uploading, refreshing and rolling back datasets need the full server (FastAPI + PostgreSQL); see the README in the
+                repository. Saved routes and history stay in this browser only.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-1.5">
@@ -269,6 +288,7 @@ export default function DataPage() {
             </p>
           </CardContent>
         </Card>
+        )}
       </div>
 
       <Card>

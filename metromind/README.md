@@ -22,6 +22,9 @@ Nothing operational is hard-coded: stations, lines, connections, colours, timing
 come from the imported feed. When the data lacks something (fares, transfer times, accessibility,
 real-time information), the app says so instead of inventing it.
 
+**Live demo:** <https://tanishqtiwari1.github.io/Metro-Path/>. The first visit downloads about 30 MB
+(the Python runtime) and takes 10–30 s to start; later visits are faster.
+
 [Architecture](docs/ARCHITECTURE.md) · [API](docs/API.md) · [Data & licensing](docs/DATA.md)
 
 ---
@@ -127,6 +130,32 @@ time. For a separately hosted frontend, set `VITE_API_BASE_URL` and `METROMIND_C
 
 Environment variables are documented in [`.env.example`](.env.example) and
 [`frontend/.env.example`](frontend/.env.example).
+
+---
+
+## Static edition (GitHub Pages)
+
+GitHub Pages can only host static files, so the Pages build runs the **real Python backend inside the
+browser** with [Pyodide](https://pyodide.org) (Python compiled to WebAssembly):
+
+- `frontend/scripts/bundle_backend.py` zips `backend/app` and the GTFS feed, recording its SHA-256.
+- A web worker (`frontend/src/workers/py.worker.ts`) loads Pyodide, pandas, SQLAlchemy and FastAPI,
+  then calls `app/inbrowser.py`. That module validates the feed and builds the network exactly as an
+  import does, then dispatches `/api/...` calls to the same handler functions the server uses.
+  Algorithms and results are therefore identical to the server's.
+- Routing uses hash URLs (`/#/plan?...`), so share links work without server rewrites.
+- Saved routes and history are kept in the visitor's browser. Dataset upload and rollback need the full
+  server and are disabled in the static edition.
+
+The workflow `.github/workflows/pages.yml` rebuilds and deploys on every push to `main`. It downloads
+the feed from `GTFS_URL` and refuses to build unless it matches `GTFS_SHA256`; both can be overridden
+with repository variables. To build locally:
+
+```bash
+cd metromind/frontend
+python3 scripts/bundle_backend.py --dataset ../backend/data/sources/<feed>.zip --label "DMRC static GTFS"
+VITE_STATIC=true VITE_BASE=/Metro-Path/ npm run build
+```
 
 ---
 

@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Component, lazy, Suspense, type ReactNode } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { Button, Callout, Skeleton, TooltipProvider } from '@/components/ui'
+import { STATIC_MODE } from '@/lib/inbrowser'
 import { PrefsProvider } from '@/lib/prefs'
 import Landing from '@/pages/Landing'
 import NotFound from '@/pages/NotFound'
@@ -14,6 +15,8 @@ const Explorer = lazy(() => import('@/pages/Explorer'))
 const Analytics = lazy(() => import('@/pages/Analytics'))
 const DataPage = lazy(() => import('@/pages/Data'))
 const Settings = lazy(() => import('@/pages/Settings'))
+
+const Router = STATIC_MODE ? HashRouter : BrowserRouter
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false }, mutations: { retry: 0 } },
@@ -59,7 +62,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <PrefsProvider>
         <TooltipProvider>
-          <BrowserRouter>
+          <Router>
             <AppShell>
               <ErrorBoundary>
                 <Suspense fallback={<PageFallback />}>
@@ -77,7 +80,7 @@ export default function App() {
                 </Suspense>
               </ErrorBoundary>
             </AppShell>
-          </BrowserRouter>
+          </Router>
         </TooltipProvider>
       </PrefsProvider>
     </QueryClientProvider>

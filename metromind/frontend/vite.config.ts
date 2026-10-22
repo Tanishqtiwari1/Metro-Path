@@ -9,6 +9,7 @@ export default defineConfig(({ mode }) => {
   // Dev-only proxy target; production builds call VITE_API_BASE_URL (or the same origin).
   const proxyTarget = env.VITE_DEV_API_PROXY || 'http://127.0.0.1:8000'
   return {
+    base: env.VITE_BASE || '/',
     plugins: [react(), tailwindcss()],
     resolve: { alias: { '@': path.resolve(import.meta.dirname, 'src') } },
     server: {

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { EngineBanner } from '@/components/EngineBanner'
 import { Badge } from '@/components/ui'
 import { usePrefs, type Theme } from '@/lib/prefs'
 import { useMeta } from '@/lib/queries'
@@ -160,6 +161,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ThemeSwitch />
           </div>
         )}
+        <EngineBanner />
         <main id="main" className="min-h-0 flex-1 overflow-auto">
           {children}
         </main>

@@ -6,6 +6,7 @@ from pathlib import Path
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from .config import get_settings
 
@@ -21,13 +22,16 @@ def make_engine(url: str) -> Engine:
         path = url.removeprefix("sqlite:///")
         if path and path != ":memory:":
             Path(path).parent.mkdir(parents=True, exist_ok=True)
+        else:  # one shared in-memory database (used by the in-browser build)
+            kwargs["poolclass"] = StaticPool
     engine = create_engine(url, **kwargs)
     if url.startswith("sqlite"):
         @event.listens_for(engine, "connect")
         def _sqlite_pragmas(dbapi_conn, _):
             cur = dbapi_conn.cursor()
             cur.execute("PRAGMA foreign_keys=ON")
-            cur.execute("PRAGMA journal_mode=WAL")
+            if path and path != ":memory:":
+                cur.execute("PRAGMA journal_mode=WAL")
             cur.close()
     return engine
 

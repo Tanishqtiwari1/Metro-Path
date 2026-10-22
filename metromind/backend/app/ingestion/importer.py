@@ -6,7 +6,6 @@ A failed import is recorded (with its report) but never touches the active datas
 import logging
 from datetime import datetime, timezone
 
-import httpx
 import pandas as pd
 from sqlalchemy import insert, select, update
 from sqlalchemy.orm import Session
@@ -44,6 +43,8 @@ def download_source(url: str, settings: Settings) -> bytes:
     """Fetch a GTFS ZIP from a configured URL with a size cap. Never follows to non-HTTP schemes."""
     if not url.lower().startswith(("https://", "http://")):
         raise ArchiveError("Only http(s) source URLs are supported.")
+    import httpx  # imported lazily: not needed (or available) in the in-browser build
+
     limit = settings.max_upload_mb * 1024 * 1024
     with httpx.Client(timeout=settings.dataset_download_timeout_s, follow_redirects=True) as client:
         with client.stream("GET", url) as resp:

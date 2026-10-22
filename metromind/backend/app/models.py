@@ -6,6 +6,7 @@ active dataset until it has validated and been committed; rollback just re-point
 """
 
 from datetime import date, datetime, timezone
+from datetime import date as datetime_date
 
 from sqlalchemy import JSON, Boolean, Date, DateTime, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -143,7 +144,8 @@ class CalendarDate(Base, _Scoped):
     __tablename__ = "calendar_dates"
     dataset_id: Mapped[int] = _Scoped._dataset_fk()
     service_id: Mapped[str] = mapped_column(String(100))
-    date: Mapped[date] = mapped_column(Date)
+    # Qualified annotation: a bare `date` here would resolve to this column, not the type (SQLAlchemy 2.0).
+    date: Mapped[datetime_date] = mapped_column(Date)
     exception_type: Mapped[int] = mapped_column(Integer)  # 1 added, 2 removed
 
 
