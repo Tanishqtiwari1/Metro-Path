@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Data (download/import GTFS yourself; see README)
+backend/data/*.db
+backend/data/*.db-*
+backend/data/sources/*.zip
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.local
+frontend/.env.local
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

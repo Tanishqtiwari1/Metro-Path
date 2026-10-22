@@ -1,0 +1,10 @@
+# OS / editor / local tool config
+.DS_Store
+.claude/
+.idea/
+.vscode/
+
+# Secrets
+.env
+.env.*
+!.env.example
