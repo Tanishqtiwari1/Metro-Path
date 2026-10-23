@@ -33,8 +33,8 @@ export default function SettingsPage() {
   const serverMinTransfer = meta.data?.defaults.min_transfer_s
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 p-4 sm:p-6">
-      <PageHeader title="Settings" description="Preferences are stored in this browser only." actions={<Button variant="outline" onClick={reset}>Restore defaults</Button>} />
+    <div className="mx-auto max-w-3xl space-y-5 p-4 sm:p-6 lg:p-8">
+      <PageHeader eyebrow="System" title="Settings" description="Preferences are stored in this browser only." actions={<Button variant="outline" onClick={reset}>Restore defaults</Button>} />
 
       <Card>
         <CardHeader>

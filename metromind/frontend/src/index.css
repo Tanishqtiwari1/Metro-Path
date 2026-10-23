@@ -3,54 +3,65 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ------------------------------------------------------------------ tokens
+   Neutral, data-first surfaces; one confident blue for action and selection;
+   amber reserved for "attention" (search frontier, warnings, highlights). */
 :root {
-  --background: 210 20% 98%;
-  --foreground: 222 47% 11%;
+  --background: 220 20% 98%;
+  --foreground: 224 32% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --muted: 214 24% 94%;
-  --muted-foreground: 215 16% 40%;
-  --border: 214 22% 88%;
-  --input: 214 22% 84%;
-  --ring: 173 80% 30%;
-  --primary: 173 80% 26%;
+  --card-foreground: 224 32% 11%;
+  --elevated: 0 0% 100%;
+  --muted: 220 16% 95%;
+  --muted-foreground: 220 9% 40%;
+  --border: 220 14% 90%;
+  --input: 220 13% 86%;
+  --ring: 221 83% 53%;
+  --primary: 221 83% 50%;
   --primary-foreground: 0 0% 100%;
-  --accent: 173 55% 94%;
-  --accent-foreground: 173 80% 20%;
-  --danger: 0 72% 45%;
-  --danger-soft: 0 85% 96%;
-  --warning: 32 95% 38%;
-  --warning-soft: 40 95% 94%;
+  --accent: 221 90% 96%;
+  --accent-foreground: 221 83% 38%;
+  --highlight: 38 92% 50%;
+  --highlight-soft: 45 100% 94%;
+  --danger: 0 72% 46%;
+  --danger-soft: 0 86% 96%;
+  --warning: 32 95% 36%;
+  --warning-soft: 42 100% 93%;
   --success: 152 65% 30%;
   --success-soft: 145 60% 94%;
-  --info-soft: 210 90% 96%;
-  --shadow: 222 47% 11%;
-  --map-bg: 210 20% 92%;
+  --info-soft: 221 90% 96%;
+  --shadow: 224 40% 20%;
+  --map-bg: 220 18% 92%;
+  --grid-dot: 220 14% 84%;
 }
 
 .dark {
-  --background: 222 30% 7%;
-  --foreground: 210 30% 96%;
-  --card: 222 27% 10%;
-  --card-foreground: 210 30% 96%;
-  --muted: 222 20% 15%;
-  --muted-foreground: 215 18% 65%;
-  --border: 222 18% 20%;
-  --input: 222 16% 26%;
-  --ring: 172 66% 50%;
-  --primary: 172 66% 45%;
-  --primary-foreground: 222 47% 8%;
-  --accent: 173 40% 16%;
-  --accent-foreground: 172 70% 75%;
-  --danger: 0 80% 66%;
-  --danger-soft: 0 40% 16%;
-  --warning: 38 92% 60%;
-  --warning-soft: 35 45% 14%;
+  --background: 225 20% 5%;
+  --foreground: 220 20% 96%;
+  --card: 225 17% 8%;
+  --card-foreground: 220 20% 96%;
+  --elevated: 225 15% 11%;
+  --muted: 225 13% 13%;
+  --muted-foreground: 220 10% 63%;
+  --border: 225 12% 16%;
+  --input: 225 11% 22%;
+  --ring: 217 91% 62%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 221 55% 16%;
+  --accent-foreground: 213 94% 80%;
+  --highlight: 40 96% 58%;
+  --highlight-soft: 38 50% 13%;
+  --danger: 0 84% 66%;
+  --danger-soft: 0 45% 14%;
+  --warning: 40 92% 62%;
+  --warning-soft: 36 45% 12%;
   --success: 152 55% 55%;
-  --success-soft: 152 35% 13%;
-  --info-soft: 215 40% 15%;
+  --success-soft: 152 35% 11%;
+  --info-soft: 221 45% 13%;
   --shadow: 0 0% 0%;
-  --map-bg: 222 25% 12%;
+  --map-bg: 225 20% 9%;
+  --grid-dot: 225 12% 18%;
 }
 
 @theme inline {
@@ -58,6 +69,7 @@
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+  --color-elevated: hsl(var(--elevated));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-border: hsl(var(--border));
@@ -67,6 +79,8 @@
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-highlight: hsl(var(--highlight));
+  --color-highlight-soft: hsl(var(--highlight-soft));
   --color-danger: hsl(var(--danger));
   --color-danger-soft: hsl(var(--danger-soft));
   --color-warning: hsl(var(--warning));
@@ -74,13 +88,52 @@
   --color-success: hsl(var(--success));
   --color-success-soft: hsl(var(--success-soft));
   --color-info-soft: hsl(var(--info-soft));
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --radius-lg: 0.75rem;
-  --radius-md: 0.5rem;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --radius-sm: 0.375rem;
-  --shadow-card: 0 1px 2px hsl(var(--shadow) / 0.06), 0 1px 1px hsl(var(--shadow) / 0.04);
-  --shadow-pop: 0 10px 30px -10px hsl(var(--shadow) / 0.25), 0 2px 6px hsl(var(--shadow) / 0.08);
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --shadow-card: 0 1px 2px hsl(var(--shadow) / 0.05), 0 1px 3px hsl(var(--shadow) / 0.04);
+  --shadow-pop: 0 12px 32px -12px hsl(var(--shadow) / 0.28), 0 2px 6px hsl(var(--shadow) / 0.08);
+  --shadow-float: 0 24px 48px -16px hsl(var(--shadow) / 0.35), 0 4px 12px hsl(var(--shadow) / 0.1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-up: fade-up 0.45s var(--ease-out-quint) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-pulse-ring: pulse-ring 1.8s var(--ease-out-quint) infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 10px hsl(var(--primary) / 0);
+  }
+}
+@keyframes dash-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @layer base {
@@ -97,25 +150,64 @@
     background: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-feature-settings: 'cv11', 'ss01';
+    font-feature-settings: 'ss01', 'cv11';
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   :focus-visible {
     outline: 2px solid var(--color-ring);
     outline-offset: 2px;
   }
+  ::selection {
+    background: hsl(var(--primary) / 0.22);
+  }
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    letter-spacing: -0.015em;
+  }
+  /* Thin, unobtrusive scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
 }
 
-/* Leaflet theming */
+/* Floating translucent panels over the map */
+@utility glass {
+  background: hsl(var(--card) / 0.88);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid hsl(var(--border) / 0.9);
+  box-shadow: var(--shadow-float);
+}
+@utility bg-dots {
+  background-image: radial-gradient(hsl(var(--grid-dot)) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+@utility text-gradient {
+  background: linear-gradient(100deg, hsl(var(--primary)), hsl(262 83% 62%) 55%, hsl(var(--highlight)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility skeleton-shimmer {
+  background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.12) 50%, hsl(var(--muted)) 100%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* --------------------------------------------------------------- Leaflet */
 .leaflet-container {
   background: hsl(var(--map-bg));
   font-family: var(--font-sans);
 }
 .dark .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85) saturate(0.6);
+  filter: invert(1) hue-rotate(180deg) brightness(0.82) contrast(0.88) saturate(0.45);
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
@@ -129,30 +221,67 @@
 }
 .leaflet-control-attribution {
   font-size: 10px;
+  border-radius: 6px 0 0 0;
 }
 .dark .leaflet-control-attribution {
-  background: hsl(222 27% 10% / 0.8) !important;
-  color: hsl(215 18% 65%);
+  background: hsl(225 17% 8% / 0.82) !important;
+  color: hsl(220 10% 63%);
 }
 .dark .leaflet-control-attribution a {
-  color: hsl(172 66% 55%);
+  color: hsl(213 94% 75%);
 }
-.dark .leaflet-bar a {
-  background: var(--color-card);
-  color: var(--color-foreground);
-  border-color: var(--color-border);
+.leaflet-bar {
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-pop) !important;
+}
+.leaflet-bar a {
+  background: var(--color-card) !important;
+  color: var(--color-foreground) !important;
+  border-color: var(--color-border) !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+}
+.leaflet-bar a:hover {
+  background: var(--color-muted) !important;
 }
 .mm-tooltip {
   background: var(--color-card);
   color: var(--color-card-foreground);
   border: 1px solid var(--color-border);
+  border-radius: 8px;
   box-shadow: var(--shadow-pop);
   font-size: 12px;
   font-weight: 500;
-  padding: 3px 7px;
+  padding: 3px 8px;
 }
 .mm-tooltip::before {
   display: none;
+}
+/* Animated "draw-on" for freshly planned routes (SVG renderer) */
+/* paths get pathLength="1", so one unit = the whole line regardless of zoom or length */
+.mm-route-anim {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: dash-draw 1.1s var(--ease-out-quint) forwards;
+}
+
+/* ---------------------------------------------------------- cmdk palette */
+[cmdk-group-heading] {
+  padding: 8px 10px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+[cmdk-item] {
+  cursor: pointer;
+}
+[cmdk-item][data-selected='true'] {
+  background: var(--color-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -160,6 +289,10 @@
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .mm-route-anim {
+    stroke-dashoffset: 0 !important;
   }
 }

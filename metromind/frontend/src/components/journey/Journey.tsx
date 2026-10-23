@@ -58,7 +58,13 @@ function StationList({ ids, names, roles }: { ids: string[]; names: Map<string, 
   )
 }
 
-export function JourneyTimeline({ journey }: { journey: StaticJourney | ScheduleJourney }) {
+export function JourneyTimeline({
+  journey,
+  onHoverRide,
+}: {
+  journey: StaticJourney | ScheduleJourney
+  onHoverRide?: (i: number | null) => void
+}) {
   const names = new Map(journey.stations.map((s: JourneyStation) => [s.id, s.name]))
   const roles = new Map(journey.stations.map((s: JourneyStation) => [s.id, s.role]))
   const rides = ridesOf(journey)
@@ -75,7 +81,7 @@ export function JourneyTimeline({ journey }: { journey: StaticJourney | Schedule
         const open = openIdx === i
         const inner = r.stations.slice(1, -1)
         return (
-          <li key={i}>
+          <li key={i} onMouseEnter={() => onHoverRide?.(i)} onMouseLeave={() => onHoverRide?.(null)} onFocus={() => onHoverRide?.(i)} onBlur={() => onHoverRide?.(null)}>
             {i > 0 && (
               <div className="flex items-center gap-3 py-2 pl-[3px] text-xs text-muted-foreground">
                 <span className="flex size-5 items-center justify-center rounded-full border border-dashed">

@@ -27,6 +27,11 @@ real-time information), the app says so instead of inventing it.
 
 [Architecture](docs/ARCHITECTURE.md) · [API](docs/API.md) · [Data & licensing](docs/DATA.md)
 
+**Using the app:** press <kbd>⌘</kbd>/<kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>/</kbd>) to search stations
+and pages from anywhere; <kbd>g</kbd> then a letter jumps between pages (<kbd>g</kbd> <kbd>p</kbd> planner,
+<kbd>g</kbd> <kbd>l</kbd> lab, <kbd>g</kbd> <kbd>c</kbd> compare…); <kbd>t</kbd> toggles the theme and <kbd>?</kbd>
+lists every shortcut. Hover a leg of an itinerary to highlight it on the map.
+
 ---
 
 ## Repository layout

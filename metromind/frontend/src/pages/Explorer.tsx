@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Crosshair, LocateFixed, MapPin, Navigation, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { DataGate } from '@/components/DataGate'
 import { LineChip, LineDots } from '@/components/LineChip'
 import { MapLegend } from '@/components/map/MapLegend'
@@ -19,7 +19,10 @@ export default function ExplorerPage() {
 
 function Explorer() {
   const network = useNetworkMap()
-  const [selected, setSelected] = useState<string | null>(null)
+  // The selected station lives in the URL (?station=ID) so it can be linked to and opened from the command palette.
+  const [params, setParams] = useSearchParams()
+  const selected = params.get('station')
+  const setSelected = (id: string | null) => setParams(id ? { station: id } : {}, { replace: true })
   const [visible, setVisible] = useState<Set<string> | null>(null)
   const [nearMode, setNearMode] = useState(false)
   const [point, setPoint] = useState<{ lat: number; lon: number } | null>(null)
@@ -56,8 +59,8 @@ function Explorer() {
 
   const d = detail.data
   return (
-    <div className="flex h-full flex-col lg:grid lg:grid-cols-[1fr_380px]">
-      <section aria-label="Network map" className="relative h-[55vh] shrink-0 lg:h-full">
+    <div className="relative flex h-full flex-col lg:block">
+      <section aria-label="Network map" className="relative h-[55vh] shrink-0 lg:absolute lg:inset-0 lg:h-full">
         {network.data ? (
           <TransitMap
             network={network.data}
@@ -74,7 +77,7 @@ function Explorer() {
         ) : (
           <Skeleton className="h-full w-full rounded-none" />
         )}
-        <div className="absolute left-14 right-3 top-3 z-[500] max-w-sm">
+        <div className="absolute left-3 right-14 top-3 z-[500] max-w-sm lg:left-4 lg:top-4 [&_div.flex]:glass">
           <StationCombobox
             label="Find a station"
             value={null}
@@ -83,13 +86,16 @@ function Explorer() {
           />
         </div>
         {network.data && (
-          <div className="absolute bottom-6 right-3 z-[500]">
+          <div className="absolute bottom-6 left-3 z-[500] lg:left-4">
             <MapLegend lines={network.data.lines} visible={visibleSet} onToggle={toggleLine} collapsible defaultOpen />
           </div>
         )}
       </section>
 
-      <aside aria-label="Station details" className="space-y-3 overflow-y-auto border-l p-4">
+      <aside
+        aria-label="Station details"
+        className="space-y-3 overflow-y-auto p-4 lg:glass lg:absolute lg:bottom-4 lg:right-16 lg:top-4 lg:z-[600] lg:w-[380px] lg:rounded-2xl"
+      >
         <Card>
           <CardHeader className="flex-row items-center justify-between">
             <CardTitle>Nearby stations</CardTitle>

@@ -77,5 +77,5 @@ export const ALGO_COLORS: Record<'gbfs' | 'bfs' | 'dijkstra' | 'astar', string> 
   gbfs: '#d97706',
   bfs: '#7c3aed',
   dijkstra: '#2563eb',
-  astar: '#0f766e',
+  astar: '#0d9488',
 }

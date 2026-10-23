@@ -1,10 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Component, lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import { CommandPalette } from '@/components/CommandPalette'
 import { AppShell } from '@/components/layout/AppShell'
+import { Shortcuts } from '@/components/Shortcuts'
 import { Button, Callout, Skeleton, TooltipProvider } from '@/components/ui'
 import { STATIC_MODE } from '@/lib/inbrowser'
-import { PrefsProvider } from '@/lib/prefs'
+import { PrefsProvider, usePrefs } from '@/lib/prefs'
 import Landing from '@/pages/Landing'
 import NotFound from '@/pages/NotFound'
 
@@ -57,12 +60,26 @@ function PageFallback() {
   )
 }
 
+function AppToaster() {
+  const { isDark } = usePrefs()
+  return (
+    <Toaster
+      theme={isDark ? 'dark' : 'light'}
+      position="bottom-right"
+      toastOptions={{ className: '!rounded-xl !border !shadow-float !font-sans' }}
+    />
+  )
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <PrefsProvider>
         <TooltipProvider>
           <Router>
+            <CommandPalette />
+            <Shortcuts />
+            <AppToaster />
             <AppShell>
               <ErrorBoundary>
                 <Suspense fallback={<PageFallback />}>

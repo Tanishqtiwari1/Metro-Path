@@ -47,8 +47,9 @@ function Analytics({ meta }: { meta: Meta }) {
 
   const a = q.data
   return (
-    <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-6">
+    <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-6 lg:p-8">
       <PageHeader
+        eyebrow="Insights"
         title="Network analytics"
         description={`Topology of the active dataset (${meta.dataset.label}). Centrality describes network structure — how many shortest paths pass through a station — not passenger demand.`}
       />
@@ -93,7 +94,7 @@ function Analytics({ meta }: { meta: Meta }) {
                     <Tooltip {...tooltipStyle} />
                     <Bar dataKey="betweenness" radius={[0, 4, 4, 0]}>
                       {a.top_betweenness.map((s) => (
-                        <Cell key={s.id} fill={hex(lines.get(s.lines[0])?.color ?? '0f766e')} />
+                        <Cell key={s.id} fill={hex(lines.get(s.lines[0])?.color ?? '3b6ff0')} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -115,7 +116,7 @@ function Analytics({ meta }: { meta: Meta }) {
                     <XAxis dataKey="degree" tick={axis} label={{ value: 'degree', position: 'insideBottom', offset: -2, fontSize: 11 }} />
                     <YAxis tick={axis} allowDecimals={false} />
                     <Tooltip {...tooltipStyle} />
-                    <Bar dataKey="stations" fill="#0f766e" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="stations" fill="#3b6ff0" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>

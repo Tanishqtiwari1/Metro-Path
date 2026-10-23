@@ -6,7 +6,7 @@ import { DataGate } from '@/components/DataGate'
 import { LineChip } from '@/components/LineChip'
 import { TransitMap } from '@/components/map/TransitMap'
 import { StationCombobox } from '@/components/StationCombobox'
-import { Badge, Button, Callout, Card, CardContent, CardDescription, CardHeader, CardTitle, EmptyState, Input, Label, NativeSelect } from '@/components/ui'
+import { Badge, Button, Callout, Card, CardContent, CardDescription, CardHeader, CardTitle, EmptyState, Input, Label, NativeSelect, PageHeader } from '@/components/ui'
 import { api, ApiError } from '@/lib/api'
 import { ALGO_COLORS, fmtCost, fmtDistance, fmtDuration, fmtMs, fmtNumber, OBJECTIVE_LABELS } from '@/lib/format'
 import { usePrefs } from '@/lib/prefs'
@@ -102,13 +102,12 @@ function Compare({ meta }: { meta: Meta }) {
     .map((r) => ({ key: r.algorithm, rides: r.journey!.rides, stations: r.journey!.stations, color: ALGO_COLORS[r.algorithm].slice(1), dashed: r.algorithm !== 'dijkstra' }))
 
   return (
-    <div className="mx-auto max-w-7xl space-y-4 p-4 sm:p-6">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Route comparison</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Every algorithm gets the same origin, destination, dataset and objective. Results are costed by the same evaluator.
-        </p>
-      </div>
+    <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-6 lg:p-8">
+      <PageHeader
+        eyebrow="Algorithms"
+        title="Route comparison"
+        description="Every algorithm gets the same origin, destination, dataset and objective, and is costed by the same evaluator."
+      />
 
       <Card className="p-4">
         <form
@@ -277,7 +276,7 @@ function Compare({ meta }: { meta: Meta }) {
                     <YAxis tick={axis} />
                     <Tooltip {...tooltipStyle} />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
-                    <Bar dataKey="expanded" fill="#0f766e" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="expanded" fill="#3b6ff0" radius={[4, 4, 0, 0]} />
                     <Bar dataKey="discovered" name="explored" fill="#94a3b8" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>

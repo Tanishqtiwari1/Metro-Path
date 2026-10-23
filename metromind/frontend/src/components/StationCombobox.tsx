@@ -93,7 +93,7 @@ export function StationCombobox({ label, value, onChange, placeholder, icon, aut
       </label>
       <div
         className={cn(
-          'flex h-10 items-center gap-2 rounded-md border border-input bg-card px-3 focus-within:outline-2 focus-within:outline-ring',
+          'flex h-10 items-center gap-2 rounded-lg border border-input bg-card px-3 shadow-card transition-colors hover:border-muted-foreground/40 focus-within:border-primary focus-within:outline-2 focus-within:outline-ring/30',
         )}
       >
         <span className="flex w-4 justify-center">{dot}</span>
@@ -140,7 +140,7 @@ export function StationCombobox({ label, value, onChange, placeholder, icon, aut
           id={`${id}-list`}
           role="listbox"
           aria-label={`${label} suggestions`}
-          className="absolute z-[1100] mt-1 max-h-72 w-full overflow-auto rounded-md border bg-card py-1 shadow-pop"
+          className="absolute z-[1100] mt-1.5 max-h-72 w-full min-w-[260px] animate-fade-up overflow-auto rounded-xl border bg-elevated p-1 shadow-float"
         >
           {loading && items.length === 0 && <li className="px-3 py-2 text-sm text-muted-foreground">Searching…</li>}
           {error && <li className="px-3 py-2 text-sm text-danger">{error}</li>}
@@ -160,7 +160,7 @@ export function StationCombobox({ label, value, onChange, placeholder, icon, aut
               }}
               onMouseEnter={() => setActive(i)}
               className={cn(
-                'flex cursor-pointer items-center justify-between gap-2 px-3 py-1.5 text-sm',
+                'flex cursor-pointer items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-sm',
                 i === active && 'bg-muted',
                 !s.routable && 'opacity-50',
               )}

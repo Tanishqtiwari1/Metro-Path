@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { toast } from 'sonner'
 import { DataGate } from '@/components/DataGate'
 import { AlternativeCard, AssumptionList, JourneyMetrics, JourneyTimeline, ridesOf, SearchStatsCard } from '@/components/journey/Journey'
 import { MapLegend } from '@/components/map/MapLegend'
@@ -82,6 +83,7 @@ function Planner({ meta }: { meta: Meta }) {
   const [selectedAlt, setSelectedAlt] = useState<number | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [hoverRide, setHoverRide] = useState<number | null>(null)
   const loadedFromUrl = useRef(false)
 
   const plan = useMutation({
@@ -192,9 +194,9 @@ function Planner({ meta }: { meta: Meta }) {
       if (selectedAlt != null)
         out.push({ key: 'primary-muted', rides: result.journey.rides, stations: result.journey.stations, muted: true, dashed: true, color: '64748b' })
     }
-    if (shown) out.push({ key: `main-${selectedAlt ?? 'p'}`, rides: ridesOf(shown), stations: shown.stations })
+    if (shown) out.push({ key: `main-${selectedAlt ?? 'p'}-${result.algorithm}`, rides: ridesOf(shown), stations: shown.stations, focus: hoverRide })
     return out
-  }, [result, shown, selectedAlt])
+  }, [result, shown, selectedAlt, hoverRide])
 
   const swap = () => {
     setOrigin(destination)
@@ -219,6 +221,7 @@ function Planner({ meta }: { meta: Meta }) {
     const url = window.location.href
     try {
       await navigator.clipboard.writeText(url)
+      toast.success('Link copied', { description: 'Anyone with the link sees this exact route and settings.' })
       setCopied(true)
       setTimeout(() => setCopied(false), 1800)
     } catch {
@@ -232,7 +235,11 @@ function Planner({ meta }: { meta: Meta }) {
       const { origin: o, destination: d, ...rest } = req
       return api.save({ origin: o, destination: d, params: rest, label: `${origin!.name} → ${destination!.name}` })
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['saved', 'favorite'] }),
+    onSuccess: () => {
+      toast.success('Route saved', { description: 'Find it under Saved when you reset the planner.' })
+      qc.invalidateQueries({ queryKey: ['saved', 'favorite'] })
+    },
+    onError: (e) => toast.error('Could not save', { description: e instanceof Error ? e.message : undefined }),
   })
 
   const exportAs = async (format: 'csv' | 'json') => {
@@ -241,8 +248,9 @@ function Planner({ meta }: { meta: Meta }) {
     try {
       const { blob, name } = await api.exportRoute({ ...req, record_history: false, format })
       downloadBlob(blob, name)
+      toast.success(`Exported ${format.toUpperCase()}`, { description: name })
     } catch (e) {
-      setNotice(e instanceof Error ? e.message : 'Export failed')
+      toast.error('Export failed', { description: e instanceof Error ? e.message : undefined })
     }
   }
 
@@ -271,8 +279,11 @@ function Planner({ meta }: { meta: Meta }) {
   const err = plan.error as ApiError | null
 
   return (
-    <div className="flex h-full flex-col lg:grid lg:grid-cols-[minmax(360px,440px)_1fr]">
-      <section aria-label="Route search" className="@container order-2 flex min-h-0 flex-col border-r lg:order-1 lg:overflow-y-auto">
+    <div className="relative flex h-full flex-col lg:block">
+      <section
+        aria-label="Route search"
+        className="@container order-2 flex min-h-0 flex-col lg:glass lg:absolute lg:bottom-4 lg:left-4 lg:top-4 lg:z-[600] lg:w-[424px] lg:overflow-y-auto lg:rounded-2xl"
+      >
         <form
           className="space-y-3 border-b p-4"
           onSubmit={(e) => {
@@ -281,7 +292,7 @@ function Planner({ meta }: { meta: Meta }) {
           }}
         >
           <div className="flex items-center justify-between">
-            <h1 className="text-base font-semibold">Plan a journey</h1>
+            <h1 className="text-lg font-semibold tracking-tight">Plan a journey</h1>
             <Button variant="ghost" size="sm" onClick={reset}>
               <RotateCcw /> Reset
             </Button>
@@ -487,13 +498,14 @@ function Planner({ meta }: { meta: Meta }) {
               saved={saveFav.isSuccess}
               saving={saveFav.isPending}
               onExport={exportAs}
+              onHoverRide={setHoverRide}
             />
           )}
           {!result && !plan.isPending && !err && <SavedPanel onLoad={loadSaved} />}
         </div>
       </section>
 
-      <section aria-label="Map" className="relative order-1 h-[42vh] shrink-0 lg:order-2 lg:h-full">
+      <section aria-label="Map" className="relative order-1 h-[42vh] shrink-0 lg:absolute lg:inset-0 lg:h-full">
         {network.data ? (
           <TransitMap
             network={network.data}
@@ -505,6 +517,7 @@ function Planner({ meta }: { meta: Meta }) {
               else if (!destination && s.id !== origin.id) setDestination(s)
             }}
             fitKey={result ? `${result.request.origin}-${result.request.destination}-${selectedAlt}-${result.algorithm}` : 'network'}
+            insetLeft={440}
           />
         ) : (
           <Skeleton className="h-full w-full rounded-none" />
@@ -515,8 +528,8 @@ function Planner({ meta }: { meta: Meta }) {
           </div>
         )}
         {!origin && network.data && (
-          <div className="absolute left-14 top-3 z-[500] rounded-md bg-card/95 px-3 py-1.5 text-xs text-muted-foreground shadow-pop">
-            Tip: click a station on the map to set the origin, then the destination.
+          <div className="glass pointer-events-none absolute left-1/2 top-4 z-[500] hidden -translate-x-1/2 animate-fade-up rounded-full px-3.5 py-1.5 text-xs text-muted-foreground lg:left-[calc(50%+220px)] sm:block">
+            Click a station on the map to set the origin, then the destination
           </div>
         )}
       </section>
@@ -535,7 +548,9 @@ function ResultPanel({
   saved,
   saving,
   onExport,
+  onHoverRide,
 }: {
+  onHoverRide?: (i: number | null) => void
   result: PlanResponse
   shown: PlanResponse['journey'] | StaticJourney
   selectedAlt: number | null
@@ -587,7 +602,7 @@ function ResultPanel({
           )}
         </CardHeader>
         <CardContent>
-          <JourneyTimeline journey={shown} />
+          <JourneyTimeline journey={shown} onHoverRide={onHoverRide} />
         </CardContent>
       </Card>
 

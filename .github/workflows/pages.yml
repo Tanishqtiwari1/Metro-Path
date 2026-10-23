@@ -40,6 +40,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: pip
+          cache-dependency-path: metromind/backend/requirements.txt
+      - name: Install backend (used to precompute instant-load snapshots)
+        run: pip install -r ../backend/requirements.txt
       - name: Download GTFS feed
         run: curl -fsSL "$GTFS_URL" -o "$RUNNER_TEMP/gtfs.zip"
       - name: Bundle backend + dataset

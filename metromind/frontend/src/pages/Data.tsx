@@ -168,8 +168,9 @@ export default function DataPage() {
   const active = meta.data?.dataset
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5 p-4 sm:p-6">
+    <div className="mx-auto max-w-6xl space-y-5 p-4 sm:p-6 lg:p-8">
       <PageHeader
+        eyebrow="System"
         title="Dataset management"
         description="MetroMind's stations, lines, connections and timetables all come from an imported GTFS feed. Nothing is hard-coded or simulated."
       />

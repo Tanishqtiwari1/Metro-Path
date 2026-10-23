@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 // Runs MetroMind's Python backend inside the browser with Pyodide (static GitHub Pages build).
 // Messages in:  {type:'init', base, saved} | {type:'request', id, method, url, headers, body}
-// Messages out: {type:'progress', stage} | {type:'ready', info} | {type:'failed', error}
+// Messages out: {type:'progress', stage, bytes} | {type:'ready', info} | {type:'failed', error}
 //               {type:'response', id, status, headers, body} | {type:'persist', saved}
 
 const PYODIDE_VERSION = '0.29.3'
@@ -15,6 +15,30 @@ let ready: Promise<void> | null = null
 
 const post = (msg: unknown) => (self as unknown as Worker).postMessage(msg)
 
+// Count bytes of every download (Pyodide runtime, packages, wheels, data) to report real progress.
+let bytesLoaded = 0
+let stage = 'Starting…'
+const report = () => post({ type: 'progress', stage, bytes: bytesLoaded })
+const realFetch = self.fetch.bind(self)
+self.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const res = await realFetch(input, init)
+  if (!res.body) return res
+  let last = 0
+  const counted = res.body.pipeThrough(
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, ctrl) {
+        bytesLoaded += chunk.byteLength
+        if (bytesLoaded - last > 256_000) {
+          last = bytesLoaded
+          report()
+        }
+        ctrl.enqueue(chunk)
+      },
+    }),
+  )
+  return new Response(counted, { status: res.status, statusText: res.statusText, headers: res.headers })
+}
+
 async function fetchBytes(url: string): Promise<Uint8Array> {
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Could not load ${url} (HTTP ${res.status})`)
@@ -22,30 +46,35 @@ async function fetchBytes(url: string): Promise<Uint8Array> {
 }
 
 async function init(base: string, saved: string) {
-  post({ type: 'progress', stage: 'Downloading the Python runtime…' })
+  const sb = `${base}static-backend/`
+  stage = 'Downloading the Python runtime…'
+  report()
+  // Site files download in parallel with the runtime.
+  const manifestP = fetch(`${sb}manifest.json`).then((r) => {
+    if (!r.ok) throw new Error('Dataset manifest missing from this build.')
+    return r.text()
+  })
+  const filesP = Promise.all([fetchBytes(`${sb}app.zip`), fetchBytes(`${sb}dataset.zip`)])
   const { loadPyodide } = await import(/* @vite-ignore */ `${PYODIDE_URL}pyodide.mjs`)
   pyodide = await loadPyodide({ indexURL: PYODIDE_URL })
 
-  post({ type: 'progress', stage: 'Loading scientific packages (pandas, SQLAlchemy, FastAPI)…' })
-  await pyodide.loadPackage(['numpy', 'pandas', 'sqlalchemy', 'sqlite3', 'pydantic', 'fastapi', 'tzdata', 'micropip'])
+  stage = 'Loading scientific packages (pandas, SQLAlchemy, FastAPI)…'
+  report()
+  await pyodide.loadPackage(['numpy', 'pandas', 'sqlalchemy', 'sqlite3', 'pydantic', 'fastapi', 'tzdata', 'micropip'], {
+    messageCallback: () => {},
+  })
+  // Pure-Python wheels served by this site (no PyPI round-trips); their dependencies were resolved at build time.
+  const manifest = await manifestP
+  const wheels: string[] = JSON.parse(manifest).wheels ?? []
   const micropip = pyodide.pyimport('micropip')
-  // Pure-Python wheels from PyPI. networkx comes straight from PyPI without dependencies: Pyodide's own
-  // build of it pulls in matplotlib (~15 MB) that MetroMind never uses.
-  await micropip.install('networkx==3.5', { deps: false })
-  await micropip.install(['pydantic-settings', 'python-multipart'])
+  await micropip.install.callKwargs(pyodide.toPy(wheels.map((w) => new URL(`${sb}wheels/${w}`, self.location.href).href)), {
+    deps: false,
+  })
 
-  post({ type: 'progress', stage: 'Loading MetroMind and the transit dataset…' })
-  const [appZip, dataZip, manifest] = await Promise.all([
-    fetchBytes(`${base}static-backend/app.zip`),
-    fetchBytes(`${base}static-backend/dataset.zip`),
-    fetch(`${base}static-backend/manifest.json`).then((r) => {
-      if (!r.ok) throw new Error('Dataset manifest missing from this build.')
-      return r.text()
-    }),
-  ])
+  stage = 'Validating the feed and building the network graph…'
+  report()
+  const [appZip, dataZip] = await filesP
   pyodide.unpackArchive(appZip, 'zip', { extractDir: '/home/pyodide' })
-
-  post({ type: 'progress', stage: 'Validating the feed and building the network graph…' })
   pyodide.globals.set('DATASET_ZIP', dataZip)
   pyodide.globals.set('MANIFEST', manifest)
   pyodide.globals.set('SAVED', saved)

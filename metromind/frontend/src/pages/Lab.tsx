@@ -142,11 +142,11 @@ function Lab({ meta }: { meta: Meta }) {
   const err = run.error as ApiError | null
 
   return (
-    <div className="flex h-full flex-col lg:grid lg:grid-cols-[400px_1fr]">
-      <div className="order-2 border-r lg:order-1 lg:overflow-y-auto">
+    <div className="relative flex h-full flex-col lg:block">
+      <div className="order-2 lg:glass lg:absolute lg:bottom-4 lg:left-4 lg:top-4 lg:z-[600] lg:w-[400px] lg:overflow-y-auto lg:rounded-2xl">
       <section aria-label="Lab controls" className="space-y-3 p-4">
         <div>
-          <h1 className="text-base font-semibold">Algorithm lab</h1>
+          <h1 className="text-lg font-semibold tracking-tight">Algorithm lab</h1>
           <p className="text-xs text-muted-foreground">Watch a real execution trace, step by step.</p>
         </div>
         <StationCombobox label="Origin" icon="origin" value={origin} onChange={setOrigin} />
@@ -339,19 +339,20 @@ function Lab({ meta }: { meta: Meta }) {
         )}
       </section>
       </div>
-      <section aria-label="Search visualisation" className="relative order-1 h-[60vh] shrink-0 lg:order-2 lg:h-full">
+      <section aria-label="Search visualisation" className="relative order-1 h-[60vh] shrink-0 lg:absolute lg:inset-0 lg:h-full">
         {network.data ? (
           <TransitMap
             network={network.data}
             explore={explore}
             routes={routes}
             fitKey={data ? `${data.search.algorithm}-${origin?.id}-${destination?.id}-${done ? 'route' : 'search'}` : 'net'}
+            insetLeft={420}
           />
         ) : (
           <Skeleton className="h-full w-full rounded-none" />
         )}
         {data && (
-          <div className="absolute inset-x-3 bottom-6 z-[500] mx-auto max-w-xl rounded-lg border bg-card/95 p-3 shadow-pop backdrop-blur">
+          <div className="glass absolute inset-x-3 bottom-6 z-[650] mx-auto max-w-xl animate-fade-up rounded-2xl p-3 lg:left-[436px] lg:right-6 lg:mx-0 lg:max-w-none xl:left-[calc(50%+40px)] xl:right-auto xl:w-[560px] xl:-translate-x-1/2">
             <div className="flex items-center gap-1">
               <Button size="icon-sm" variant="ghost" aria-label="Reset" onClick={() => { setPlaying(false); setIdx(0) }}>
                 <ChevronFirst />
@@ -396,7 +397,7 @@ function Lab({ meta }: { meta: Meta }) {
           </div>
         )}
         {!data && network.data && (
-          <div className="absolute left-14 top-3 z-[500] rounded-md bg-card/95 px-3 py-1.5 text-xs text-muted-foreground shadow-pop">
+          <div className="glass pointer-events-none absolute left-1/2 top-4 z-[500] -translate-x-1/2 animate-fade-up rounded-full px-3.5 py-1.5 text-xs text-muted-foreground lg:left-[calc(50%+210px)]">
             Pick two stations and an algorithm, then press Run.
           </div>
         )}
